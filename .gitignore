@@ -1,8 +1,35 @@
+# Python virtual environments
 env/
+venv/
+ENV/
+.env
+
+# Dataset and large data files
 dataset/
-.ipynb_checkpoints/
-__pycache__/
-*.pyc
-*.pkl
+*.zip
+*.tar.gz
+
+# Pretrained model weights (GitHub 100MB limit)
 *.h5
 *.keras
+models/*.keras
+models/*.h5
+
+# Byte-compiled / cache files
+__pycache__/
+*.py[cod]
+*$py.class
+*.pkl
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# IDE & Editor files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# OS generated files
+.DS_Store
+Thumbs.db

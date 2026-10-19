@@ -1,0 +1,430 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Deepfake Detector Noir | AI Forensics Lab</title>
+    <!-- المكتبات الخارجية: Tailwind للتحكم في التنسيق، Confetti للاحتفال، و Vanilla-Tilt للتأثير ثلاثي الأبعاد -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.7.0/vanilla-tilt.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=Syne:wght@700;800&family=Space+Grotesk:wght@300;500&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --bg-dark: #050507;
+        --accent-purple: #8b5cf6;
+        --accent-pink: #ec4899;
+        --card-bg: rgba(15, 15, 20, 0.7);
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background-color: var(--bg-dark);
+        background-image:
+          radial-gradient(
+            circle at 10% 20%,
+            rgba(139, 92, 246, 0.1) 0%,
+            transparent 40%
+          ),
+          radial-gradient(
+            circle at 90% 80%,
+            rgba(236, 72, 153, 0.1) 0%,
+            transparent 40%
+          );
+        font-family: "Plus Jakarta Sans", sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: #ffffff;
+        overflow-x: hidden;
+      }
+
+      /* حاوية التصميم الجديد - أسلوب Cyber-Luxe */
+      .cyber-container {
+        width: 95%;
+        max-width: 1100px;
+        background: var(--card-bg);
+        backdrop-filter: blur(40px);
+        -webkit-backdrop-filter: blur(40px);
+        border-radius: 24px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        padding: 3rem;
+        position: relative;
+        box-shadow: 0 40px 100px rgba(0, 0, 0, 0.8);
+      }
+
+      /* خطوط العنوان الراقية */
+      .title-main {
+        font-family: "Syne", sans-serif;
+        font-weight: 800;
+        letter-spacing: -2px;
+        background: linear-gradient(to right, #fff, #a78bfa);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-size: clamp(2rem, 5vw, 3.5rem);
+      }
+
+      /* تصميم منطقة الرفع - Iris Scan Style */
+      .upload-portal {
+        width: 100%;
+        aspect-ratio: 1/1;
+        max-width: 400px;
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid rgba(139, 92, 246, 0.2);
+        border-radius: 100%;
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        overflow: hidden;
+        margin: 0 auto;
+      }
+
+      .upload-portal:hover {
+        border-color: var(--accent-purple);
+        box-shadow: 0 0 50px rgba(139, 92, 246, 0.2);
+        transform: scale(1.02);
+      }
+
+      /* تأثير المسح الدائري */
+      .circle-scanner {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        border: 2px solid var(--accent-purple);
+        border-radius: 100%;
+        clip-path: polygon(0 0, 100% 0, 100% 20%, 0 20%);
+        animation: circleScan 3s infinite ease-in-out;
+        display: none;
+        z-index: 10;
+      }
+
+      @keyframes circleScan {
+        0% {
+          transform: translateY(-100%);
+          opacity: 0;
+        }
+        50% {
+          opacity: 1;
+        }
+        100% {
+          transform: translateY(100%);
+          opacity: 0;
+        }
+      }
+
+      /* كرت النتائج - Glass Panel */
+      .result-panel {
+        background: rgba(255, 255, 255, 0.03);
+        border-left: 4px solid var(--accent-purple);
+        padding: 2rem;
+        border-radius: 0 20px 20px 0;
+        display: none;
+        animation: slideInRight 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+
+      @keyframes slideInRight {
+        from {
+          opacity: 0;
+          transform: translateX(30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+
+      /* الأزرار التفاعلية */
+      .btn-noir {
+        background: #ffffff;
+        color: #000000;
+        padding: 14px 40px;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: 0.3s;
+      }
+
+      .btn-noir:hover {
+        background: var(--accent-purple);
+        color: #fff;
+        box-shadow: 0 10px 30px rgba(139, 92, 246, 0.4);
+      }
+
+      /* تفاصيل تقنية في الخلفية */
+      .grid-bg {
+        position: absolute;
+        inset: 0;
+        background-image: radial-gradient(
+          rgba(255, 255, 255, 0.05) 1px,
+          transparent 0
+        );
+        background-size: 40px 40px;
+        pointer-events: none;
+        opacity: 0.5;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="grid-bg"></div>
+
+    <div
+      class="cyber-container"
+      data-tilt
+      data-tilt-max="1"
+      data-tilt-glare
+      data-tilt-max-glare="0.1"
+    >
+      <!-- Header - الترويسة -->
+      <div
+        class="flex flex-col md:flex-row justify-between items-start md:items-center mb-16 gap-6"
+      >
+        <div>
+          <h1 class="title-main">DEEPFAKE SCAN</h1>
+          <p
+            class="text-purple-400/60 font-mono text-xs tracking-[0.5em] uppercase"
+          >
+            Neural Engine v3.0
+          </p>
+        </div>
+        <div class="flex flex-col items-end">
+          <span class="font-['Syne'] text-2xl text-white/90">AI Forensics Lab</span>
+          <span
+            class="text-[10px] text-white/30 font-bold tracking-widest uppercase"
+            >Lead Developer • Engine: ResNet-50</span
+          >
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+        <!-- Left: Scanning Module - وحدة المسح -->
+        <div class="relative">
+          <div class="upload-portal" id="drop-area">
+            <input type="file" id="file-input" hidden accept="image/*" />
+            <div id="drop-content" class="text-center group">
+              <div
+                class="mb-4 opacity-40 group-hover:opacity-100 transition-opacity"
+              >
+                <svg
+                  class="w-12 h-12 mx-auto text-purple-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="1.5"
+                    d="M12 4v16m8-8H4"
+                  ></path>
+                </svg>
+              </div>
+              <p
+                class="text-sm font-medium text-white/40 group-hover:text-white transition-colors uppercase tracking-widest"
+              >
+                Load Subject
+              </p>
+            </div>
+            <div id="scanner" class="circle-scanner"></div>
+            <img
+              id="preview-img"
+              class="hidden w-full h-full object-cover scale-110"
+              alt="Subject"
+            />
+          </div>
+
+          <!-- مأثرات الزوايا التقنية -->
+          <div
+            class="absolute -top-2 -left-2 w-8 h-8 border-t-2 border-l-2 border-purple-500/30"
+          ></div>
+          <div
+            class="absolute -bottom-2 -right-2 w-8 h-8 border-b-2 border-r-2 border-purple-500/30"
+          ></div>
+        </div>
+
+        <!-- Right: Diagnostics - لوحة التشخيص -->
+        <div class="space-y-8">
+          <div
+            id="idle-msg"
+            class="border border-white/5 bg-white/[0.02] p-10 rounded-3xl text-center"
+          >
+            <p class="text-white/20 font-light italic tracking-wide">
+              Waiting for biometric data input...
+            </p>
+          </div>
+
+          <!-- شاشة التحميل الاستباقية -->
+          <div id="loading-state" class="hidden space-y-6">
+            <div class="flex justify-between items-end">
+              <span
+                class="text-xs font-bold text-purple-400 uppercase tracking-widest"
+                >Analyzing Frame</span
+              >
+              <span class="text-xs text-white/20 font-mono" id="load-percent"
+                >0%</span
+              >
+            </div>
+            <div class="h-[2px] w-full bg-white/5 overflow-hidden">
+              <div
+                class="h-full bg-purple-500 animate-[loading_2s_ease-in-out_infinite]"
+                style="width: 30%"
+              ></div>
+            </div>
+            <p
+              class="text-[10px] text-white/40 uppercase tracking-widest text-center"
+            >
+              Cross-referencing neural patterns
+            </p>
+          </div>
+
+          <div id="result-panel" class="result-panel space-y-6">
+            <div>
+              <div class="flex items-center gap-4 mb-2">
+                <div
+                  id="status-light"
+                  class="w-3 h-3 rounded-full animate-pulse"
+                ></div>
+                <h3
+                  id="res-title"
+                  class="text-5xl font-black tracking-tighter text-white uppercase"
+                ></h3>
+              </div>
+              <p id="res-prob" class="text-purple-400 font-mono text-sm"></p>
+            </div>
+
+            <p
+              id="res-desc"
+              class="text-xs text-white/40 leading-relaxed font-light italic"
+            ></p>
+
+            <div class="pt-6">
+              <button class="btn-noir" onclick="location.reload()">
+                New Scan
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer Data - بيانات التذييل -->
+      <div
+        class="mt-20 flex justify-between items-center text-[10px] font-mono text-white/20 border-t border-white/5 pt-8"
+      >
+        <div class="flex gap-8">
+          <span>COORD: 30.0444° N, 31.2357° E</span>
+          <span>SYSTEM: STABLE</span>
+        </div>
+        <span class="tracking-[0.3em]">SECURE_CONNECTION_AES256</span>
+      </div>
+    </div>
+
+    <script>
+      const dropArea = document.getElementById("drop-area");
+      const fileInput = document.getElementById("file-input");
+      const previewImg = document.getElementById("preview-img");
+      const scanner = document.getElementById("scanner");
+      const dropContent = document.getElementById("drop-content");
+      const loadingState = document.getElementById("loading-state");
+      const idleMsg = document.getElementById("idle-msg");
+      const resultPanel = document.getElementById("result-panel");
+      const resTitle = document.getElementById("res-title");
+      const resDesc = document.getElementById("res-desc");
+      const resProb = document.getElementById("res-prob");
+      const statusLight = document.getElementById("status-light");
+
+      dropArea.onclick = () => fileInput.click();
+      fileInput.onchange = (e) => handleUpload(e.target.files[0]);
+
+      function handleUpload(file) {
+        if (!file) return;
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => {
+          // UI Transformation - تحويل الواجهة
+          dropContent.classList.add("hidden");
+          previewImg.src = reader.result;
+          previewImg.classList.remove("hidden");
+          scanner.style.display = "block";
+          idleMsg.classList.add("hidden");
+          loadingState.classList.remove("hidden");
+          resultPanel.style.display = "none";
+
+          startAnalysis(file);
+        };
+      }
+
+      async function startAnalysis(file) {
+        const formData = new FormData();
+        formData.append("file", file);
+
+        try {
+          // الاتصال بخادم البايثون المحلي
+          const response = await fetch("http://localhost:5000/predict", {
+            method: "POST",
+            body: formData,
+          });
+          const data = await response.json();
+
+          // محاكاة وقت التحليل لتعزيز التجربة
+          let percent = 0;
+          const interval = setInterval(() => {
+            percent += 1;
+            document.getElementById("load-percent").innerText = percent + "%";
+            if (percent >= 100) {
+              clearInterval(interval);
+              displayOutput(data);
+            }
+          }, 20);
+        } catch (err) {
+          console.error(err);
+          alert("Neural Link Failure. Verify server.py status.");
+          location.reload();
+        }
+      }
+
+      function displayOutput(data) {
+        scanner.style.display = "none";
+        loadingState.classList.add("hidden");
+        resultPanel.style.display = "block";
+
+        if (data.label === "AUTHENTIC") {
+          resTitle.innerText = "REAL";
+          resProb.innerText = `Confidence: ${data.confidence}%`;
+          resDesc.innerText = "Authentic biometric patterns detected.";
+          statusLight.className =
+            "w-3 h-3 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_15px_rgba(16,185,129,0.6)]";
+
+          confetti({
+            particleCount: 100,
+            spread: 70,
+            origin: { y: 0.6 },
+            colors: ["#8b5cf6", "#ffffff"],
+          });
+        } else {
+          resTitle.innerText = "FAKE";
+          resProb.innerText = `Confidence: ${data.confidence}%`;
+          resDesc.innerText = "Synthetic generative artifacts identified.";
+          statusLight.className =
+            "w-3 h-3 rounded-full bg-rose-500 animate-pulse shadow-[0_0_15px_rgba(244,63,94,0.6)]";
+        }
+      }
+
+      // تفعيل حركة الـ Tilt الاحترافية
+      VanillaTilt.init(document.querySelectorAll(".cyber-container"), {
+        max: 1.5,
+        speed: 1000,
+        glare: true,
+        "max-glare": 0.1,
+      });
+    </script>
+  </body>
+</html>

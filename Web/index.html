@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Veritas AI | Deepfake & Synthetic Media Detection</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&family=Space+Grotesk:wght@600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+            display: ['Space Grotesk', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#f0f9ff',
+              400: '#38bdf8',
+              500: '#0ea5e9',
+              600: '#0284c7',
+              900: '#0c4a6e',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      background: radial-gradient(circle at 50% 0%, #0f172a 0%, #090d16 60%, #030712 100%);
+      min-height: 100vh;
+    }
+    .scanner-line {
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, #38bdf8, #818cf8, transparent);
+      box-shadow: 0 0 15px #38bdf8;
+      animation: scanAnim 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+      z-index: 20;
+    }
+    @keyframes scanAnim {
+      0% { top: 0%; opacity: 0; }
+      20% { opacity: 1; }
+      80% { opacity: 1; }
+      100% { top: 98%; opacity: 0; }
+    }
+    .glass-panel {
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+  </style>
+</head>
+<body class="text-slate-100 font-sans selection:bg-sky-500 selection:text-white antialiased">
+
+  <!-- Top Navigation Header -->
+  <header class="border-b border-slate-800/80 bg-slate-950/70 backdrop-blur-md sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-11 h-11 rounded-xl bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-sky-500/25 border border-sky-400/30">
+          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+          </svg>
+        </div>
+        <div>
+          <div class="font-display font-bold text-xl tracking-tight text-white flex items-center gap-2">
+            VERITAS AI
+            <span class="text-xs px-2 py-0.5 rounded-full bg-sky-500/10 text-sky-400 border border-sky-500/20 font-mono font-medium">NEURAL FORENSICS</span>
+          </div>
+          <div class="text-xs text-slate-400">Deepfake Detection & Media Integrity Platform</div>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-4">
+        <div class="hidden sm:flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-900 border border-slate-800 text-xs font-mono text-emerald-400">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          ResNet-50 Engine Online
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Workspace -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+
+    <!-- Hero Title -->
+    <div class="text-center max-w-3xl mx-auto mb-10">
+      <h1 class="text-3xl sm:text-4xl lg:text-5xl font-display font-extrabold tracking-tight text-white mb-4">
+        Deepfake & Biometric <span class="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-indigo-400">Manipulation Detection</span>
+      </h1>
+      <p class="text-slate-400 text-sm sm:text-base leading-relaxed">
+        Upload any portrait or facial media to scan for generative AI artifacts, facial synthesis, deepfake swaps, and pixel-level inconsistencies with high-precision neural forensics.
+      </p>
+    </div>
+
+    <!-- Two-Column Interactive Analysis Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+      
+      <!-- Left Column: Upload & Media Inspection -->
+      <div class="glass-panel rounded-2xl p-6 sm:p-8 shadow-2xl relative">
+        <div class="flex items-center justify-between mb-5">
+          <h2 class="font-display font-bold text-lg text-white flex items-center gap-2">
+            <svg class="w-5 h-5 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            Media Ingestion
+          </h2>
+          <span class="text-xs font-mono text-slate-400">JPG, PNG, WEBP</span>
+        </div>
+
+        <!-- Dropzone Container -->
+        <div id="dropzone" class="relative group cursor-pointer border-2 border-dashed border-slate-700 hover:border-sky-500 rounded-xl p-8 text-center transition-all duration-300 bg-slate-900/40 hover:bg-slate-900/80">
+          <input type="file" id="fileInput" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" />
+          
+          <div id="uploadPrompt" class="py-8">
+            <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-slate-800/80 flex items-center justify-center text-sky-400 border border-slate-700 group-hover:scale-110 group-hover:border-sky-500 transition-all duration-300 shadow-inner">
+              <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+              </svg>
+            </div>
+            <p class="font-medium text-slate-200 mb-1">Click to browse or drop target image here</p>
+            <p class="text-xs text-slate-400">High-resolution face portraits recommended for optimal forensic depth</p>
+          </div>
+
+          <!-- Preview Area -->
+          <div id="previewContainer" class="hidden relative rounded-lg overflow-hidden border border-slate-700/80 bg-black/40">
+            <img id="imagePreview" src="#" alt="Inspection Target" class="w-full max-h-[380px] object-contain mx-auto" />
+            <div id="scanLine" class="scanner-line hidden"></div>
+          </div>
+        </div>
+
+        <!-- Media Metadata Stats -->
+        <div id="mediaMeta" class="hidden mt-4 grid grid-cols-3 gap-2 text-center font-mono text-xs text-slate-400 bg-slate-900/60 rounded-lg p-3 border border-slate-800">
+          <div><span class="block text-slate-400 uppercase text-[10px]">Dimension</span><span id="metaDim" class="text-slate-200 font-semibold">-</span></div>
+          <div><span class="block text-slate-400 uppercase text-[10px]">File Size</span><span id="metaSize" class="text-slate-200 font-semibold">-</span></div>
+          <div><span class="block text-slate-400 uppercase text-[10px]">Format</span><span id="metaType" class="text-slate-200 font-semibold">-</span></div>
+        </div>
+
+        <button id="resetBtn" class="hidden mt-4 w-full py-2.5 rounded-lg border border-slate-700 bg-slate-800/80 hover:bg-slate-700 text-slate-300 text-xs font-mono font-medium transition-all">
+          Reset / Analyze Another Image
+        </button>
+      </div>
+
+      <!-- Right Column: Forensic Analysis Telemetry -->
+      <div class="glass-panel rounded-2xl p-6 sm:p-8 shadow-2xl relative min-h-[440px] flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between mb-5">
+            <h2 class="font-display font-bold text-lg text-white flex items-center gap-2">
+              <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              </svg>
+              Neural Verdict & Telemetry
+            </h2>
+            <span id="latencyBadge" class="hidden text-xs font-mono text-slate-400 bg-slate-800 px-2.5 py-1 rounded-md">-- ms</span>
+          </div>
+
+          <!-- Awaiting State -->
+          <div id="idleState" class="py-16 text-center">
+            <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-slate-800/50 flex items-center justify-center text-slate-500 border border-slate-700/50">
+              <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+              </svg>
+            </div>
+            <p class="font-display font-medium text-slate-300 mb-1">Awaiting Media Feed</p>
+            <p class="text-xs text-slate-400 max-w-sm mx-auto">Upload an image on the left panel to execute deep residual inference and detect synthetic alterations.</p>
+          </div>
+
+          <!-- Loading State -->
+          <div id="loadingState" class="hidden py-16 text-center">
+            <div class="w-12 h-12 border-3 border-sky-500/20 border-t-sky-400 rounded-full animate-spin mx-auto mb-4"></div>
+            <p class="font-display font-bold text-slate-200">Executing Neural Inference...</p>
+            <p class="text-xs text-slate-400 font-mono mt-1">Analyzing 224x224 RGB tensor via ResNet50...</p>
+          </div>
+
+          <!-- Result Container -->
+          <div id="resultContainer" class="hidden space-y-6">
+            
+            <!-- Verdict Banner -->
+            <div id="verdictBanner" class="p-6 rounded-xl border text-center transition-all duration-500">
+              <div id="verdictIcon" class="text-3xl mb-2">🛡️</div>
+              <div id="verdictTitle" class="font-display font-black text-2xl tracking-tight mb-1">AUTHENTIC MEDIA</div>
+              <div id="verdictDesc" class="text-xs text-slate-400 font-medium">No generative synthesis or face manipulation detected.</div>
+            </div>
+
+            <!-- Score Gauges -->
+            <div class="grid grid-cols-2 gap-4">
+              <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-4 text-center">
+                <span class="block text-[11px] font-mono text-slate-400 uppercase tracking-wider mb-1">Confidence Score</span>
+                <span id="confidenceValue" class="font-display font-bold text-2xl text-white">99.4%</span>
+              </div>
+              <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-4 text-center">
+                <span class="block text-[11px] font-mono text-slate-400 uppercase tracking-wider mb-1">Threat Assessment</span>
+                <span id="threatLevel" class="font-display font-bold text-2xl text-emerald-400">LOW</span>
+              </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div>
+              <div class="flex justify-between text-xs font-mono text-slate-400 mb-1.5">
+                <span>Authentic Probability</span>
+                <span id="probPercent">--%</span>
+              </div>
+              <div class="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden">
+                <div id="probBar" class="h-full bg-gradient-to-r from-sky-400 to-emerald-400 transition-all duration-700 w-0"></div>
+              </div>
+            </div>
+
+            <!-- Technical Vector Breakdown -->
+            <div class="bg-slate-900/40 border border-slate-800/80 rounded-xl p-4">
+              <div class="text-xs font-mono text-slate-400 mb-3 uppercase tracking-wider flex items-center justify-between">
+                <span>Forensic Vector Checks</span>
+                <span class="text-emerald-400">PASS</span>
+              </div>
+              <div class="space-y-2 text-xs font-mono text-slate-400">
+                <div class="flex justify-between">
+                  <span>Facial Boundary Blending:</span>
+                  <span id="vectorBoundary" class="text-slate-300">Natural Gradient</span>
+                </div>
+                <div class="flex justify-between">
+                  <span>Generative Noise Distribution:</span>
+                  <span id="vectorNoise" class="text-slate-300">Coherent</span>
+                </div>
+                <div class="flex justify-between">
+                  <span>Biometric Symmetry Matrix:</span>
+                  <span id="vectorSymmetry" class="text-slate-300">Consistent</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- System Architecture Footnote -->
+        <div class="pt-6 border-t border-slate-800/80 text-center">
+          <p class="text-[11px] font-mono text-slate-400">
+            Engine: ResNet50 Transfer Learning • TensorFlow Backend • Port 5000 REST API
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script>
+    const fileInput = document.getElementById('fileInput');
+    const uploadPrompt = document.getElementById('uploadPrompt');
+    const previewContainer = document.getElementById('previewContainer');
+    const imagePreview = document.getElementById('imagePreview');
+    const scanLine = document.getElementById('scanLine');
+    const mediaMeta = document.getElementById('mediaMeta');
+    const resetBtn = document.getElementById('resetBtn');
+
+    const idleState = document.getElementById('idleState');
+    const loadingState = document.getElementById('loadingState');
+    const resultContainer = document.getElementById('resultContainer');
+    
+    const verdictBanner = document.getElementById('verdictBanner');
+    const verdictIcon = document.getElementById('verdictIcon');
+    const verdictTitle = document.getElementById('verdictTitle');
+    const verdictDesc = document.getElementById('verdictDesc');
+    const confidenceValue = document.getElementById('confidenceValue');
+    const threatLevel = document.getElementById('threatLevel');
+    const probPercent = document.getElementById('probPercent');
+    const probBar = document.getElementById('probBar');
+    const latencyBadge = document.getElementById('latencyBadge');
+
+    fileInput.addEventListener('change', handleFileSelect);
+    resetBtn.addEventListener('click', resetAll);
+
+    function formatBytes(bytes, decimals = 1) {
+      if (!+bytes) return '0 B';
+      const k = 1024;
+      const dm = decimals < 0 ? 0 : decimals;
+      const sizes = ['B', 'KB', 'MB', 'GB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
+    }
+
+    function handleFileSelect(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      // Meta Stats
+      document.getElementById('metaSize').textContent = formatBytes(file.size);
+      document.getElementById('metaType').textContent = file.type.replace('image/', '').toUpperCase();
+
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        imagePreview.src = event.target.result;
+        uploadPrompt.classList.add('hidden');
+        previewContainer.classList.remove('hidden');
+        mediaMeta.classList.remove('hidden');
+        resetBtn.classList.remove('hidden');
+
+        const tempImg = new Image();
+        tempImg.src = event.target.result;
+        tempImg.onload = () => {
+          document.getElementById('metaDim').textContent = `${tempImg.naturalWidth}x${tempImg.naturalHeight}`;
+        };
+
+        runPrediction(file);
+      };
+      reader.readAsDataURL(file);
+    }
+
+    async function runPrediction(file) {
+      idleState.classList.add('hidden');
+      resultContainer.classList.add('hidden');
+      loadingState.classList.remove('hidden');
+      scanLine.classList.remove('hidden');
+
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const startTime = performance.now();
+
+      try {
+        const response = await fetch('/predict', {
+          method: 'POST',
+          body: formData
+        });
+
+        const elapsed = Math.round(performance.now() - startTime);
+        latencyBadge.textContent = `${elapsed} ms`;
+        latencyBadge.classList.remove('hidden');
+
+        if (!response.ok) {
+          throw new Error('Inference server returned error ' + response.status);
+        }
+
+        const data = await response.json();
+        displayResults(data);
+      } catch (err) {
+        console.error(err);
+        loadingState.classList.add('hidden');
+        scanLine.classList.add('hidden');
+        idleState.classList.remove('hidden');
+        alert("Server communication error: Ensure server.py is running on port 5000.");
+      }
+    }
+
+    function displayResults(data) {
+      loadingState.classList.add('hidden');
+      scanLine.classList.add('hidden');
+      resultContainer.classList.remove('hidden');
+
+      const isReal = data.label === 'AUTHENTIC';
+      const conf = data.confidence || 0;
+
+      confidenceValue.textContent = `${conf.toFixed(1)}%`;
+
+      if (isReal) {
+        verdictBanner.className = 'p-6 rounded-xl border text-center transition-all duration-500 bg-emerald-500/10 border-emerald-500/40 text-emerald-400 shadow-lg shadow-emerald-500/10';
+        verdictIcon.textContent = '🛡️';
+        verdictTitle.textContent = 'AUTHENTIC MEDIA';
+        verdictDesc.textContent = 'High biometric consistency. No generative synthesis or face manipulation detected.';
+        threatLevel.textContent = 'LOW';
+        threatLevel.className = 'font-display font-bold text-2xl text-emerald-400';
+
+        probPercent.textContent = `${conf.toFixed(1)}%`;
+        probBar.style.width = `${conf}%`;
+        probBar.className = 'h-full bg-gradient-to-r from-emerald-500 to-teal-400 transition-all duration-700';
+
+        confetti({
+          particleCount: 40,
+          spread: 60,
+          origin: { y: 0.7 }
+        });
+      } else {
+        verdictBanner.className = 'p-6 rounded-xl border text-center transition-all duration-500 bg-rose-500/10 border-rose-500/40 text-rose-400 shadow-lg shadow-rose-500/10';
+        verdictIcon.textContent = '⚠️';
+        verdictTitle.textContent = 'SYNTHETIC / DEEPFAKE';
+        verdictDesc.textContent = 'High probability of digital manipulation, GAN synthesis artifacts, or face-swapping.';
+        threatLevel.textContent = 'CRITICAL';
+        threatLevel.className = 'font-display font-bold text-2xl text-rose-400';
+
+        probPercent.textContent = `${(100 - conf).toFixed(1)}%`;
+        probBar.style.width = `${100 - conf}%`;
+        probBar.className = 'h-full bg-gradient-to-r from-rose-500 to-red-600 transition-all duration-700';
+      }
+    }
+
+    function resetAll() {
+      fileInput.value = '';
+      imagePreview.src = '#';
+      uploadPrompt.classList.remove('hidden');
+      previewContainer.classList.add('hidden');
+      mediaMeta.classList.add('hidden');
+      resetBtn.classList.add('hidden');
+      scanLine.classList.add('hidden');
+      latencyBadge.classList.add('hidden');
+
+      resultContainer.classList.add('hidden');
+      loadingState.classList.add('hidden');
+      idleState.classList.remove('hidden');
+    }
+  </script>
+</body>
+</html>

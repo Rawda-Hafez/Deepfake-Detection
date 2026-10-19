@@ -1,0 +1,559 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Deepfake Detector | Ethereal Edition</title>
+
+    <!-- المكتبات الخارجية -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.7.0/vanilla-tilt.min.js"></script>
+
+    <!-- خطوط فائقة الأناقة -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Jost:wght@300;400;500;700&family=Great+Vibes&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --rose-gold: #e2a9a9;
+        --soft-blush: #fcd5ce;
+        --lavender: #e8dff5;
+        --champagne: #fcf6bd;
+        --glass-bg: rgba(255, 255, 255, 0.45);
+        --glass-border: rgba(255, 255, 255, 0.6);
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background-color: #fdfbfb;
+        font-family: "Jost", sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: #4a4a4a;
+        overflow: hidden; /* يمنع السكرول المزعج */
+        perspective: 1200px;
+      }
+
+      /* ==========================================
+           1. تأثيرات الخلفية المستمرة (Always-on Effects)
+           ========================================== */
+
+      /* كرات الألوان المضيئة (Aurora Effect) */
+      .color-blob {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(80px);
+        opacity: 0.7;
+        animation: floatBlob 15s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 0;
+      }
+
+      .blob-1 {
+        background: #ff9a9e;
+        width: 500px;
+        height: 500px;
+        top: -10%;
+        left: -10%;
+        animation-delay: 0s;
+      }
+      .blob-2 {
+        background: #fecfef;
+        width: 600px;
+        height: 600px;
+        bottom: -20%;
+        right: -10%;
+        animation-delay: -5s;
+      }
+      .blob-3 {
+        background: #e2a9a9;
+        width: 400px;
+        height: 400px;
+        top: 30%;
+        left: 40%;
+        animation-delay: -10s;
+      }
+
+      @keyframes floatBlob {
+        0% {
+          transform: translate(0, 0) scale(1);
+        }
+        50% {
+          transform: translate(50px, 50px) scale(1.1);
+        }
+        100% {
+          transform: translate(-30px, 80px) scale(0.9);
+        }
+      }
+
+      /* النجوم/اللمعان المتطاير (Glitter) */
+      .glitter {
+        position: absolute;
+        background: white;
+        border-radius: 50%;
+        pointer-events: none;
+        box-shadow:
+          0 0 10px white,
+          0 0 20px var(--rose-gold);
+        animation: sparkleFall linear infinite;
+        z-index: 1;
+      }
+
+      @keyframes sparkleFall {
+        0% {
+          transform: translateY(100vh) scale(0);
+          opacity: 0;
+        }
+        20% {
+          opacity: 1;
+          scale: 1;
+        }
+        80% {
+          opacity: 1;
+        }
+        100% {
+          transform: translateY(-20vh) scale(0);
+          opacity: 0;
+        }
+      }
+
+      /* ==========================================
+           2. التصميم الزجاجي الرئيسي (Glassmorphism)
+           ========================================== */
+
+      .ethereal-glass {
+        width: 90%;
+        max-width: 950px;
+        background: var(--glass-bg);
+        backdrop-filter: blur(35px);
+        -webkit-backdrop-filter: blur(35px);
+        border-radius: 50px;
+        border: 1px solid var(--glass-border);
+        padding: 4rem;
+        box-shadow:
+          0 30px 60px rgba(226, 169, 169, 0.2),
+          inset 0 0 30px rgba(255, 255, 255, 0.8);
+        position: relative;
+        z-index: 10;
+        transform-style: preserve-3d;
+      }
+
+      /* ==========================================
+           3. الخطوط والنصوص الأنيقة
+           ========================================== */
+
+      .chic-title {
+        font-family: "Cormorant Garamond", serif;
+        font-size: clamp(3rem, 7vw, 4.5rem);
+        font-style: italic;
+        background: linear-gradient(to right, #b56576, #e56b6f, #eaac8b);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-weight: 700;
+        line-height: 1;
+        margin-bottom: 0.5rem;
+        transform: translateZ(60px);
+      }
+
+      .signature {
+        font-family: "Great Vibes", cursive;
+        font-size: 2.5rem;
+        color: #d5bdaf;
+        text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
+        transform: translateZ(40px);
+      }
+
+      /* ==========================================
+           4. منطقة رفع الصورة (Upload Magic Mirror)
+           ========================================== */
+
+      .magic-mirror {
+        background: rgba(255, 255, 255, 0.4);
+        border: 2px dashed #e2a9a9;
+        border-radius: 40px;
+        height: 380px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+        transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        transform-style: preserve-3d;
+        box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.6);
+      }
+
+      .magic-mirror:hover {
+        background: rgba(255, 255, 255, 0.7);
+        border-style: solid;
+        border-color: #b56576;
+        transform: translateZ(30px) translateY(-5px);
+        box-shadow:
+          0 15px 30px rgba(226, 169, 169, 0.3),
+          inset 0 0 30px rgba(255, 255, 255, 1);
+      }
+
+      /* تأثير المسح الضوئي الأنثوي */
+      .beauty-scan-line {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 5px;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          #fff,
+          #fecfef,
+          #fff,
+          transparent
+        );
+        box-shadow:
+          0 0 15px #fecfef,
+          0 0 30px #fff;
+        z-index: 20;
+        display: none;
+        animation: scanEthereal 2.5s ease-in-out infinite;
+      }
+
+      @keyframes scanEthereal {
+        0% {
+          top: 0%;
+          opacity: 0;
+        }
+        15% {
+          opacity: 1;
+        }
+        85% {
+          opacity: 1;
+        }
+        100% {
+          top: 100%;
+          opacity: 0;
+        }
+      }
+
+      /* ==========================================
+           5. عرض النتائج والأنيميشن
+           ========================================== */
+
+      .result-stage {
+        display: none;
+        text-align: center;
+        animation: fadeInScale 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275)
+          forwards;
+        transform-style: preserve-3d;
+      }
+
+      @keyframes fadeInScale {
+        0% {
+          opacity: 0;
+          transform: scale(0.9) translateZ(-50px);
+        }
+        100% {
+          opacity: 1;
+          transform: scale(1) translateZ(40px);
+        }
+      }
+
+      /* كلمة النتيجة الضخمة (REAL/FAKE) */
+      .huge-result {
+        font-family: "Jost", sans-serif;
+        font-size: 5.5rem;
+        font-weight: 900;
+        letter-spacing: 4px;
+        line-height: 1;
+        margin-bottom: 1rem;
+        text-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+      }
+
+      /* زر إعادة الفحص الأنيق */
+      .btn-ethereal {
+        background: linear-gradient(120deg, #fdfbfb 0%, #ebedee 100%);
+        color: #b56576;
+        padding: 16px 45px;
+        border-radius: 50px;
+        font-family: "Jost", sans-serif;
+        font-weight: 600;
+        font-size: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        border: 1px solid #fff;
+        box-shadow: 0 10px 20px rgba(226, 169, 169, 0.3);
+        cursor: pointer;
+        transition: 0.4s;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .btn-ethereal:hover {
+        transform: translateY(-3px) scale(1.05);
+        box-shadow: 0 15px 25px rgba(226, 169, 169, 0.4);
+        color: #d5bdaf;
+      }
+
+      /* دائرة التحميل الناعمة */
+      .loader-ring {
+        width: 70px;
+        height: 70px;
+        border: 3px solid rgba(255, 255, 255, 0.4);
+        border-top: 3px solid #e2a9a9;
+        border-right: 3px solid #fecfef;
+        border-radius: 50%;
+        animation: spinEthereal 1.5s cubic-bezier(0.68, -0.55, 0.265, 1.55)
+          infinite;
+        margin: 0 auto;
+      }
+
+      @keyframes spinEthereal {
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- مؤثرات الشاشة الدائمة (Always-on Screen Effects) -->
+    <div class="color-blob blob-1"></div>
+    <div class="color-blob blob-2"></div>
+    <div class="color-blob blob-3"></div>
+    <div id="glitter-container"></div>
+
+    <!-- الحاوية الرئيسية -->
+    <div
+      class="ethereal-glass"
+      data-tilt
+      data-tilt-max="4"
+      data-tilt-speed="1000"
+      data-tilt-glare
+      data-tilt-max-glare="0.2"
+    >
+      <!-- الترويسة -->
+      <div class="text-center mb-12">
+        <h1 class="chic-title">Deepfake Detector</h1>
+        <div
+          class="flex flex-col items-center justify-center mt-2"
+          style="transform: translateZ(40px)"
+        >
+          <span class="signature">AI Forensics Lab</span>
+          <span
+            class="bg-white/60 px-4 py-1 rounded-full text-[10px] uppercase tracking-[0.2em] font-bold text-gray-500 shadow-sm mt-2"
+            >Engine: ResNet-50</span
+          >
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+        <!-- 1. منطقة الرفع (Upload) -->
+        <div class="relative perspective-1000 z-20">
+          <div class="magic-mirror" id="drop-area">
+            <input type="file" id="file-input" hidden accept="image/*" />
+
+            <div
+              id="drop-content"
+              class="text-center transition-all duration-300"
+            >
+              <div
+                class="w-16 h-16 bg-white/80 rounded-full flex items-center justify-center mx-auto mb-4 shadow-[0_5px_15px_rgba(226,169,169,0.3)]"
+              >
+                <span class="text-3xl opacity-80">✨</span>
+              </div>
+              <p
+                class="font-['Cormorant_Garamond'] text-2xl font-bold text-[#b56576] italic"
+              >
+                Reveal Your Glow
+              </p>
+              <p class="text-xs uppercase tracking-widest text-gray-400 mt-2">
+                Tap to Upload
+              </p>
+            </div>
+
+            <div id="scanner" class="beauty-scan-line"></div>
+            <img
+              id="preview-img"
+              class="hidden w-full h-full object-cover rounded-[36px] p-2"
+              alt="Subject"
+            />
+          </div>
+        </div>
+
+        <!-- 2. منطقة الإخراج (Output Panel) -->
+        <div class="flex flex-col justify-center min-h-[300px] z-20">
+          <!-- رسالة الانتظار -->
+          <div
+            id="idle-msg"
+            class="text-center bg-white/30 p-10 rounded-[40px] border border-white/50"
+          >
+            <p class="font-['Cormorant_Garamond'] text-xl italic text-gray-500">
+              Waiting for a beautiful portrait...
+            </p>
+          </div>
+
+          <!-- التحميل -->
+          <div id="loading-state" class="hidden text-center space-y-6">
+            <div class="loader-ring"></div>
+            <p
+              class="font-['Jost'] text-sm uppercase tracking-[0.3em] font-bold text-[#b56576] animate-pulse"
+            >
+              Analyzing Glow...
+            </p>
+          </div>
+
+          <!-- النتيجة المباشرة -->
+          <div id="result-stage" class="result-stage">
+            <!-- كلمة REAL او FAKE الضخمة -->
+            <h2 id="res-title" class="huge-result"></h2>
+
+            <!-- نسبة الثقة -->
+            <div
+              class="bg-white/50 rounded-3xl p-5 mb-8 border border-white inline-block w-full"
+            >
+              <p
+                class="text-[10px] text-gray-400 font-bold uppercase tracking-[0.3em] mb-2"
+              >
+                Confidence
+              </p>
+              <p
+                id="res-prob"
+                class="text-3xl font-bold text-[#9d8189] font-['Cormorant_Garamond'] italic"
+              ></p>
+            </div>
+
+            <button class="btn-ethereal w-full" onclick="location.reload()">
+              Scan Another ✨
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // --- 1. تأثير الجزيئات اللامعة المستمر (Glitter) ---
+      function createGlitter() {
+        const container = document.getElementById("glitter-container");
+        const glitter = document.createElement("div");
+        glitter.className = "glitter";
+
+        // أحجام وأماكن عشوائية
+        const size = Math.random() * 4 + 2;
+        glitter.style.width = `${size}px`;
+        glitter.style.height = `${size}px`;
+        glitter.style.left = `${Math.random() * 100}vw`;
+        glitter.style.animationDuration = `${Math.random() * 5 + 5}s`;
+
+        container.appendChild(glitter);
+        setTimeout(() => glitter.remove(), 10000);
+      }
+      setInterval(createGlitter, 150);
+
+      // --- 2. المنطق البرمجي ---
+      const dropArea = document.getElementById("drop-area");
+      const fileInput = document.getElementById("file-input");
+      const previewImg = document.getElementById("preview-img");
+      const scanner = document.getElementById("scanner");
+      const dropContent = document.getElementById("drop-content");
+      const loadingState = document.getElementById("loading-state");
+      const idleMsg = document.getElementById("idle-msg");
+      const resultStage = document.getElementById("result-stage");
+      const resTitle = document.getElementById("res-title");
+      const resProb = document.getElementById("res-prob");
+
+      dropArea.onclick = () => fileInput.click();
+      fileInput.onchange = (e) => handleUpload(e.target.files[0]);
+
+      function handleUpload(file) {
+        if (!file) return;
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => {
+          // إظهار الصورة وبدء الأنيميشن
+          dropContent.classList.add("hidden");
+          previewImg.src = reader.result;
+          previewImg.classList.remove("hidden");
+
+          scanner.style.display = "block";
+          idleMsg.classList.add("hidden");
+          loadingState.classList.remove("hidden");
+          resultStage.style.display = "none";
+
+          startAnalysis(file);
+        };
+      }
+
+      async function startAnalysis(file) {
+        const formData = new FormData();
+        formData.append("file", file);
+
+        try {
+          // الربط بالخادم الخاص بك
+          const response = await fetch("http://localhost:5000/predict", {
+            method: "POST",
+            body: formData,
+          });
+          const data = await response.json();
+
+          // تأخير بسيط لإعطاء إحساس بالسحر والتحليل
+          setTimeout(() => {
+            displayOutput(data);
+          }, 2500);
+        } catch (err) {
+          console.error(err);
+          alert("Magic connection failed. Is your server.py running?");
+          location.reload();
+        }
+      }
+
+      function displayOutput(data) {
+        scanner.style.display = "none";
+        loadingState.classList.add("hidden");
+        resultStage.style.display = "block";
+
+        if (data.label === "AUTHENTIC") {
+          // تصميم حالة الـ REAL
+          resTitle.innerText = "REAL";
+          resTitle.style.background =
+            "linear-gradient(to right, #d4af37, #b5c99a)";
+          resTitle.style.webkitBackgroundClip = "text";
+          resTitle.style.webkitTextFillColor = "transparent";
+          resProb.innerText = `${data.confidence}%`;
+
+          // احتفال ذهبي ووردي
+          confetti({
+            particleCount: 150,
+            spread: 90,
+            origin: { y: 0.6 },
+            colors: ["#fecfef", "#e2a9a9", "#ffffff", "#d4af37"],
+          });
+        } else {
+          // تصميم حالة الـ FAKE
+          resTitle.innerText = "FAKE";
+          resTitle.style.background =
+            "linear-gradient(to right, #e56b6f, #b56576)";
+          resTitle.style.webkitBackgroundClip = "text";
+          resTitle.style.webkitTextFillColor = "transparent";
+          resProb.innerText = `${data.confidence}%`;
+
+          // تغيير لون الإطار بشكل ناعم للتنبيه
+          document.querySelector(".ethereal-glass").style.borderColor =
+            "rgba(229, 107, 111, 0.4)";
+          document.querySelector(".ethereal-glass").style.boxShadow =
+            "0 30px 60px rgba(229, 107, 111, 0.2)";
+        }
+      }
+
+      // --- 3. تفعيل الـ 3D الناعم ---
+      VanillaTilt.init(document.querySelectorAll(".ethereal-glass"), {
+        max: 4,
+        speed: 1000,
+        glare: true,
+        "max-glare": 0.25,
+        scale: 1.01,
+      });
+    </script>
+  </body>
+</html>

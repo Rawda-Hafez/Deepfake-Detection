@@ -1,0 +1,558 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Deepfake Detector | Neural Edition</title>
+
+    <!-- المكتبات: Tailwind, Confetti, Vanilla-Tilt -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.7.0/vanilla-tilt.min.js"></script>
+
+    <!-- خطوط مستقبلية وتقنية -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=Share+Tech+Mono&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --cyan: #00f3ff;
+        --neon-purple: #bc13fe;
+        --dark-bg: #050814;
+        --glass-panel: rgba(10, 15, 30, 0.7);
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background-color: var(--dark-bg);
+        font-family: "Rajdhani", sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: #fff;
+        overflow: hidden;
+        perspective: 1200px;
+      }
+
+      /* شبكة البيانات في الخلفية */
+      .cyber-grid {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background-image:
+          linear-gradient(rgba(0, 243, 255, 0.05) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(0, 243, 255, 0.05) 1px, transparent 1px);
+        background-size: 40px 40px;
+        z-index: 0;
+        transform: perspective(500px) rotateX(60deg) translateY(-100px)
+          translateZ(-200px);
+        animation: gridMove 10s linear infinite;
+      }
+
+      @keyframes gridMove {
+        0% {
+          background-position: 0 0;
+        }
+        100% {
+          background-position: 0 40px;
+        }
+      }
+
+      /* حاوية النظام الذكي */
+      .hud-container {
+        width: 95%;
+        max-width: 1000px;
+        background: var(--glass-panel);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(0, 243, 255, 0.2);
+        border-radius: 15px;
+        padding: 3rem;
+        box-shadow:
+          0 0 40px rgba(0, 243, 255, 0.1),
+          inset 0 0 20px rgba(0, 243, 255, 0.05);
+        position: relative;
+        z-index: 10;
+        transform-style: preserve-3d;
+      }
+
+      /* زوايا الشاشة التقنية */
+      .hud-container::before,
+      .hud-container::after {
+        content: "";
+        position: absolute;
+        width: 30px;
+        height: 30px;
+        border-color: var(--cyan);
+        transition: 0.3s;
+      }
+      .hud-container::before {
+        top: -1px;
+        left: -1px;
+        border-top: 3px solid;
+        border-left: 3px solid;
+      }
+      .hud-container::after {
+        bottom: -1px;
+        right: -1px;
+        border-bottom: 3px solid;
+        border-right: 3px solid;
+      }
+
+      /* العنوان مع تأثير النيون والـ Glitch */
+      .neon-title {
+        font-size: clamp(2.5rem, 5vw, 4rem);
+        font-weight: 700;
+        color: #fff;
+        text-shadow:
+          0 0 10px var(--cyan),
+          0 0 20px var(--cyan),
+          0 0 40px var(--cyan);
+        letter-spacing: 2px;
+        margin-bottom: 0.5rem;
+        transform: translateZ(60px);
+      }
+
+      /* شارة المطور التقنية */
+      .dev-badge {
+        font-family: "Share Tech Mono", monospace;
+        background: rgba(0, 243, 255, 0.1);
+        border: 1px solid var(--cyan);
+        color: var(--cyan);
+        padding: 8px 20px;
+        border-radius: 4px;
+        display: inline-flex;
+        gap: 15px;
+        box-shadow: 0 0 15px rgba(0, 243, 255, 0.2);
+        transform: translateZ(40px);
+      }
+
+      /* منطقة الرفع بتصميم الرادار */
+      .biometric-scanner {
+        background: rgba(0, 0, 0, 0.4);
+        border: 1px dashed var(--cyan);
+        border-radius: 10px;
+        height: 380px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+        transition: 0.3s;
+        transform-style: preserve-3d;
+      }
+
+      .biometric-scanner:hover {
+        background: rgba(0, 243, 255, 0.05);
+        box-shadow: inset 0 0 30px rgba(0, 243, 255, 0.2);
+        border-style: solid;
+      }
+
+      /* شبكة الليزر أثناء الفحص */
+      .laser-grid {
+        position: absolute;
+        top: -100%;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          to bottom,
+          transparent,
+          rgba(0, 243, 255, 0.3) 50%,
+          var(--cyan) 100%
+        );
+        border-bottom: 2px solid var(--cyan);
+        box-shadow: 0 5px 20px var(--cyan);
+        animation: scanSubject 2s ease-in-out infinite;
+        display: none;
+        z-index: 20;
+      }
+
+      @keyframes scanSubject {
+        0% {
+          top: -100%;
+        }
+        50% {
+          top: 0%;
+        }
+        100% {
+          top: 100%;
+        }
+      }
+
+      /* لوحة النتيجة */
+      .data-panel {
+        background: rgba(0, 0, 0, 0.6);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+        padding: 3rem;
+        display: none;
+        text-align: center;
+        transform-style: preserve-3d;
+        animation: glitchApperance 0.4s ease-out forwards;
+      }
+
+      @keyframes glitchApperance {
+        0% {
+          opacity: 0;
+          transform: scale(0.9) translateZ(-50px);
+          filter: hue-rotate(90deg);
+        }
+        100% {
+          opacity: 1;
+          transform: scale(1) translateZ(30px);
+          filter: hue-rotate(0deg);
+        }
+      }
+
+      /* زر إعادة الضبط */
+      .cyber-btn {
+        background: transparent;
+        color: var(--cyan);
+        border: 1px solid var(--cyan);
+        padding: 12px 35px;
+        font-family: "Share Tech Mono", monospace;
+        font-size: 1.1rem;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        position: relative;
+        overflow: hidden;
+        transition: 0.3s;
+        cursor: pointer;
+        box-shadow: 0 0 10px rgba(0, 243, 255, 0.2);
+      }
+
+      .cyber-btn:hover {
+        background: var(--cyan);
+        color: #000;
+        box-shadow:
+          0 0 20px var(--cyan),
+          0 0 40px var(--cyan);
+      }
+
+      /* الجزيئات الرقمية العائمة */
+      .data-node {
+        position: fixed;
+        width: 3px;
+        height: 15px;
+        background: var(--cyan);
+        opacity: 0.5;
+        animation: dataFall linear infinite;
+      }
+
+      @keyframes dataFall {
+        0% {
+          transform: translateY(-100vh);
+          opacity: 0;
+        }
+        50% {
+          opacity: 1;
+        }
+        100% {
+          transform: translateY(100vh);
+          opacity: 0;
+        }
+      }
+
+      /* تأثير التشويش للنصوص */
+      .text-glitch {
+        animation: glitch-anim 2s infinite linear alternate-reverse;
+      }
+
+      /* دائرة المعالجة */
+      .process-ring {
+        width: 70px;
+        height: 70px;
+        border: 3px solid transparent;
+        border-top: 3px solid var(--cyan);
+        border-right: 3px solid var(--neon-purple);
+        border-radius: 50%;
+        animation: spin 1s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- مؤثرات الخلفية (الشبكة والبيانات) -->
+    <div class="cyber-grid"></div>
+    <div id="nodes-container"></div>
+
+    <div
+      class="hud-container"
+      data-tilt
+      data-tilt-max="4"
+      data-tilt-speed="400"
+      data-tilt-glare
+      data-tilt-max-glare="0.15"
+    >
+      <!-- الترويسة -->
+      <div class="text-center mb-12">
+        <h1 class="neon-title">NEURAL AI SCANNER</h1>
+        <div class="dev-badge mt-2">
+          <span>SYS: NEURAL_ENGINE</span>
+          <span>|</span>
+          <span>Engine: ResNet-50</span>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
+        <!-- قسم الرفع (Biometric Input) -->
+        <div class="relative perspective-1000">
+          <div class="biometric-scanner" id="drop-area">
+            <input type="file" id="file-input" hidden accept="image/*" />
+
+            <div
+              id="drop-content"
+              class="text-center transition-all duration-300"
+              style="transform: translateZ(30px)"
+            >
+              <!-- أيقونة مستهدفة مستقبلية -->
+              <div
+                class="w-20 h-20 border-2 border-cyan-400 rounded-full flex items-center justify-center mx-auto mb-6 relative"
+              >
+                <div
+                  class="w-16 h-16 border border-dashed border-cyan-400 rounded-full animate-[spin_4s_linear_infinite]"
+                ></div>
+                <div class="absolute w-2 h-2 bg-cyan-400 rounded-full"></div>
+              </div>
+              <p
+                class="text-xl font-bold text-cyan-400 tracking-widest uppercase"
+              >
+                Input Subject
+              </p>
+              <p class="font-['Share_Tech_Mono'] text-sm text-cyan-400/50 mt-2">
+                Drag & Drop or Click to Initialize
+              </p>
+            </div>
+
+            <div id="scanner" class="laser-grid"></div>
+            <img
+              id="preview-img"
+              class="hidden w-full h-full object-cover p-1 opacity-80 mix-blend-screen"
+              alt="Subject"
+            />
+          </div>
+
+          <!-- إطارات جانبية ديكورية -->
+          <div
+            class="absolute top-1/2 -left-4 w-2 h-16 bg-cyan-500/20 -translate-y-1/2"
+          ></div>
+          <div
+            class="absolute top-1/2 -right-4 w-2 h-16 bg-cyan-500/20 -translate-y-1/2"
+          ></div>
+        </div>
+
+        <!-- قسم النتيجة المباشرة -->
+        <div class="flex flex-col justify-center min-h-[380px]">
+          <!-- رسالة النظام في وضع الاستعداد -->
+          <div
+            id="idle-msg"
+            class="text-center py-12 bg-black/40 rounded-lg border border-cyan-500/20"
+          >
+            <div class="w-full flex justify-center mb-4">
+              <div class="w-24 h-[1px] bg-cyan-500/50"></div>
+            </div>
+            <p
+              class="font-['Share_Tech_Mono'] text-cyan-400/70 text-lg uppercase tracking-widest text-glitch"
+            >
+              System Standing By...
+            </p>
+            <div class="w-full flex justify-center mt-4">
+              <div class="w-24 h-[1px] bg-cyan-500/50"></div>
+            </div>
+          </div>
+
+          <!-- اللودر التقني -->
+          <div
+            id="loading-state"
+            class="hidden text-center flex flex-col items-center space-y-6"
+          >
+            <div class="process-ring"></div>
+            <div class="font-['Share_Tech_Mono']">
+              <p
+                class="text-cyan-400 font-bold text-lg tracking-[0.2em] mb-2"
+                id="loading-text"
+              >
+                EXTRACTING BIOMETRICS...
+              </p>
+              <p class="text-cyan-400/50 text-xs">
+                Querying Neural Network Core
+              </p>
+            </div>
+          </div>
+
+          <!-- لوحة النتيجة المباشرة (REAL / FAKE) -->
+          <div id="result-panel" class="data-panel w-full">
+            <!-- النتيجة الأساسية -->
+            <h2
+              id="res-title"
+              class="text-[5rem] leading-none font-black mb-6 tracking-tighter drop-shadow-2xl"
+            ></h2>
+
+            <!-- نسبة الثقة بخط رقمي -->
+            <div class="bg-black/50 border border-white/10 rounded-lg p-4 mb-8">
+              <p
+                class="font-['Share_Tech_Mono'] text-white/50 text-sm uppercase tracking-widest mb-1"
+              >
+                Confidence Score
+              </p>
+              <p
+                id="res-prob"
+                class="font-['Share_Tech_Mono'] text-3xl font-bold"
+              ></p>
+            </div>
+
+            <button class="cyber-btn w-full" onclick="location.reload()">
+              [ INITIALIZE NEW SCAN ]
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // --- مولد الجزيئات الرقمية (Data Nodes) ---
+      function spawnNodes() {
+        const node = document.createElement("div");
+        node.className = "data-node";
+        node.style.left = Math.random() * 100 + "vw";
+        node.style.height = Math.random() * 20 + 5 + "px";
+        node.style.animationDuration = Math.random() * 2 + 1 + "s";
+
+        // تلوين عشوائي نيون أو سيان
+        node.style.background =
+          Math.random() > 0.5 ? "var(--cyan)" : "var(--neon-purple)";
+
+        document.getElementById("nodes-container").appendChild(node);
+        setTimeout(() => node.remove(), 3000);
+      }
+      setInterval(spawnNodes, 150);
+
+      // --- المنطق البرمجي للواجهة ---
+      const dropArea = document.getElementById("drop-area");
+      const fileInput = document.getElementById("file-input");
+      const previewImg = document.getElementById("preview-img");
+      const scanner = document.getElementById("scanner");
+      const dropContent = document.getElementById("drop-content");
+      const loadingState = document.getElementById("loading-state");
+      const loadingText = document.getElementById("loading-text");
+      const idleMsg = document.getElementById("idle-msg");
+      const resultPanel = document.getElementById("result-panel");
+      const resTitle = document.getElementById("res-title");
+      const resProb = document.getElementById("res-prob");
+
+      dropArea.onclick = () => fileInput.click();
+      fileInput.onchange = (e) => handleUpload(e.target.files[0]);
+
+      function handleUpload(file) {
+        if (!file) return;
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => {
+          dropContent.classList.add("hidden");
+          previewImg.src = reader.result;
+          previewImg.classList.remove("hidden");
+
+          // تشغيل الليزر واللودر
+          scanner.style.display = "block";
+          idleMsg.classList.add("hidden");
+          loadingState.classList.remove("hidden");
+          loadingState.classList.add("flex");
+          resultPanel.style.display = "none";
+
+          // محاكاة نصوص التحليل المتغيرة
+          const texts = [
+            "ANALYZING PIXELS...",
+            "CHECKING NEURAL PATTERNS...",
+            "DECODING SYNTHESIS...",
+          ];
+          let txtIdx = 0;
+          const txtInterval = setInterval(() => {
+            loadingText.innerText = texts[txtIdx % texts.length];
+            txtIdx++;
+          }, 700);
+
+          startAnalysis(file, txtInterval);
+        };
+      }
+
+      async function startAnalysis(file, txtInterval) {
+        const formData = new FormData();
+        formData.append("file", file);
+
+        try {
+          // الاتصال بـ server.py (تأكدي من تشغيله)
+          const response = await fetch("http://localhost:5000/predict", {
+            method: "POST",
+            body: formData,
+          });
+          const data = await response.json();
+
+          // تأخير لمحاكاة الفحص العميق
+          setTimeout(() => {
+            clearInterval(txtInterval);
+            displayOutput(data);
+          }, 2500);
+        } catch (err) {
+          console.error(err);
+          alert(
+            "SYSTEM ERROR: Backend connection failed. Is server.py active?",
+          );
+          location.reload();
+        }
+      }
+
+      function displayOutput(data) {
+        scanner.style.display = "none";
+        loadingState.classList.add("hidden");
+        loadingState.classList.remove("flex");
+        resultPanel.style.display = "block";
+
+        if (data.label === "AUTHENTIC") {
+          // ستايل النتيجة REAL (نيون سيان)
+          resTitle.innerText = "REAL";
+          resTitle.style.color = "#00f3ff";
+          resTitle.style.textShadow = "0 0 20px #00f3ff, 0 0 40px #00f3ff";
+          resProb.innerText = `${data.confidence}%`;
+          resProb.style.color = "#00f3ff";
+
+          // قصاصات احتفال رقمية (Digital Sparks)
+          confetti({
+            particleCount: 150,
+            spread: 100,
+            origin: { y: 0.6 },
+            colors: ["#00f3ff", "#ffffff"],
+            shapes: ["square"], // لتشبه البيانات الرقمية
+          });
+        } else {
+          // ستايل النتيجة FAKE (نيون أحمر/وردي)
+          resTitle.innerText = "FAKE";
+          resTitle.style.color = "#ff0055";
+          resTitle.style.textShadow = "0 0 20px #ff0055, 0 0 40px #ff0055";
+          resProb.innerText = `${data.confidence}%`;
+          resProb.style.color = "#ff0055";
+
+          // تنبيه بصري خفيف للـ Fake
+          document.querySelector(".hud-container").style.borderColor =
+            "rgba(255, 0, 85, 0.5)";
+          document.querySelector(".hud-container").style.boxShadow =
+            "0 0 40px rgba(255, 0, 85, 0.2)";
+        }
+      }
+
+      // --- تفعيل تأثير 3D للـ HUD بالكامل ---
+      VanillaTilt.init(document.querySelectorAll(".hud-container"), {
+        max: 4,
+        speed: 400,
+        glare: true,
+        "max-glare": 0.15,
+        scale: 1.01,
+      });
+    </script>
+  </body>
+</html>

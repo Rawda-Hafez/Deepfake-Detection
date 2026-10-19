@@ -1,0 +1,452 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Deepfake Detector Elite | AI Forensics Lab</title>
+    <!-- Dependencies -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.7.0/vanilla-tilt.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Syne:wght@700;800&family=Dancing+Script:wght@600&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --mauve-light: #f3e8ff;
+        --mauve-deep: #9d50bb;
+        --pink-soft: #fbcfe8;
+        --pink-deep: #ec4899;
+        --glass-bg: rgba(255, 255, 255, 0.45);
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: radial-gradient(circle at 0% 0%, #fdf2f8 0%, #f3e8ff 100%);
+        font-family: "Inter", sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
+      }
+
+      /* Compact & Elegant Container */
+      .app-container {
+        width: 90%;
+        max-width: 920px;
+        background: var(--glass-bg);
+        backdrop-filter: blur(25px);
+        -webkit-backdrop-filter: blur(25px);
+        border-radius: 40px;
+        border: 1px solid rgba(255, 255, 255, 0.7);
+        box-shadow: 0 25px 50px -12px rgba(157, 80, 187, 0.15);
+        padding: 2.5rem;
+        position: relative;
+        z-index: 10;
+        overflow: hidden;
+      }
+
+      /* Subtle Shimmer Effect (لمعان) */
+      .app-container::after {
+        content: "";
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: linear-gradient(
+          45deg,
+          transparent 45%,
+          rgba(255, 255, 255, 0.1) 50%,
+          transparent 55%
+        );
+        transform: rotate(45deg);
+        animation: shimmer 6s infinite;
+        pointer-events: none;
+      }
+
+      @keyframes shimmer {
+        0% {
+          transform: translateX(-100%) rotate(45deg);
+        }
+        100% {
+          transform: translateX(100%) rotate(45deg);
+        }
+      }
+
+      /* Sophisticated Title */
+      .title-h1 {
+        font-family: "Syne", sans-serif;
+        font-weight: 800;
+        background: linear-gradient(135deg, #6e48aa, #9d50bb);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-size: 2.4rem;
+        letter-spacing: -1.5px;
+      }
+
+      .author-sign {
+        font-family: "Dancing Script", cursive;
+        color: var(--pink-deep);
+        font-size: 1.6rem;
+        text-shadow: 0 10px 20px rgba(236, 72, 153, 0.1);
+      }
+
+      /* Minimal 3D Upload Card */
+      .upload-card {
+        background: rgba(255, 255, 255, 0.5);
+        border: 2px dashed #e2e8f0;
+        border-radius: 32px;
+        height: 310px;
+        transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+        overflow: hidden;
+        transform-style: preserve-3d;
+      }
+
+      .upload-card:hover {
+        border-color: var(--mauve-deep);
+        background: rgba(255, 255, 255, 0.85);
+        transform: translateY(-8px) scale(1.02);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
+      }
+
+      /* Professional Laser Scan (تحركات احترافية) */
+      .scan-bar {
+        position: absolute;
+        width: 100%;
+        height: 3px;
+        background: linear-gradient(
+          to right,
+          transparent,
+          var(--mauve-deep),
+          transparent
+        );
+        box-shadow: 0 0 15px var(--mauve-deep);
+        top: 0;
+        left: 0;
+        z-index: 5;
+        display: none;
+        animation: moveScan 2.2s infinite ease-in-out;
+      }
+
+      @keyframes moveScan {
+        0%,
+        100% {
+          top: 0;
+          opacity: 0;
+        }
+        10%,
+        90% {
+          opacity: 1;
+        }
+        50% {
+          top: 100%;
+        }
+      }
+
+      /* Result Panel Styling */
+      .result-panel {
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 32px;
+        padding: 2rem;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.03);
+        display: none;
+        animation: panelFadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+
+      @keyframes panelFadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px) scale(0.95);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
+      }
+
+      /* Soft Background Glows */
+      .bg-glow {
+        position: fixed;
+        width: 500px;
+        height: 500px;
+        background: radial-gradient(
+          circle,
+          rgba(157, 80, 187, 0.08),
+          transparent 70%
+        );
+        z-index: 1;
+        filter: blur(60px);
+        pointer-events: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="bg-glow" style="top: -150px; left: -150px"></div>
+    <div class="bg-glow" style="bottom: -150px; right: -150px"></div>
+
+    <div
+      class="app-container"
+      data-tilt
+      data-tilt-max="2"
+      data-tilt-speed="1000"
+      data-tilt-glare
+      data-tilt-max-glare="0.1"
+    >
+      <!-- Header -->
+      <div class="flex justify-between items-center mb-10 relative z-20">
+        <div>
+          <h1 class="title-h1">Deepfake Detector</h1>
+          <p
+            class="text-gray-400 text-[10px] font-bold tracking-[0.3em] uppercase"
+          >
+            Forensic Digital Analysis
+          </p>
+        </div>
+        <div class="text-right">
+          <span class="author-sign">AI Forensics Lab</span>
+          <p
+            class="text-[9px] text-gray-400 font-black uppercase tracking-widest mt-1 opacity-60"
+          >
+            Engine: ResNet-50
+          </p>
+        </div>
+      </div>
+
+      <div
+        class="grid grid-cols-1 md:grid-cols-2 gap-10 items-center relative z-20"
+      >
+        <!-- Left Side: Upload Zone -->
+        <div class="perspective-1000">
+          <div class="upload-card" id="drop-area">
+            <input type="file" id="file-input" hidden accept="image/*" />
+            <div
+              id="drop-content"
+              class="text-center p-6 transition-all duration-500"
+            >
+              <div
+                class="w-14 h-14 bg-purple-50 rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-inner"
+              >
+                <svg
+                  class="w-7 h-7 text-purple-500 opacity-80"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
+                  ></path>
+                </svg>
+              </div>
+              <h2 class="text-md font-bold text-gray-700 tracking-tight">
+                Initiate Scan
+              </h2>
+              <p class="text-gray-400 text-[11px] mt-2 font-medium">
+                Select or drag a portrait to analyze
+              </p>
+            </div>
+            <div id="scan-bar" class="scan-bar"></div>
+            <img
+              id="preview-img"
+              class="hidden w-full h-full object-cover rounded-[28px]"
+              alt="Preview"
+            />
+          </div>
+        </div>
+
+        <!-- Right Side: Analysis Engine -->
+        <div class="min-h-[300px] flex flex-col justify-center">
+          <div
+            id="idle-state"
+            class="text-center py-12 border border-dashed border-gray-100 rounded-[32px] bg-white/20 backdrop-blur-sm transition-all duration-500"
+          >
+            <p
+              class="text-gray-400 text-xs font-medium italic opacity-70 tracking-wide"
+            >
+              Analysis core standby...
+            </p>
+          </div>
+
+          <div id="loading-state" class="hidden text-center animate-pulse">
+            <div
+              class="w-9 h-9 border-[3px] border-purple-100 border-t-purple-600 rounded-full animate-spin mx-auto mb-5"
+            ></div>
+            <p
+              class="text-[10px] font-black text-purple-800 tracking-[0.2em] uppercase"
+            >
+              Processing Pixels
+            </p>
+          </div>
+
+          <div id="result-panel" class="result-panel">
+            <div class="flex justify-between items-center mb-5">
+              <div class="flex items-center gap-3">
+                <div
+                  id="status-dot"
+                  class="w-2.5 h-2.5 rounded-full shadow-sm"
+                ></div>
+                <h3
+                  id="result-title"
+                  class="text-lg font-extrabold text-gray-800 tracking-tight"
+                ></h3>
+              </div>
+              <span
+                id="conf-text"
+                class="text-[10px] font-black text-gray-400 uppercase tracking-widest"
+              ></span>
+            </div>
+            <div
+              class="h-1.5 w-full bg-gray-50 rounded-full mb-5 overflow-hidden"
+            >
+              <div
+                id="conf-bar"
+                class="h-full transition-all duration-[1.5s] cubic-bezier(0.16, 1, 0.3, 1)"
+                style="width: 0%"
+              ></div>
+            </div>
+            <p
+              id="result-text"
+              class="text-[13px] text-gray-500 leading-relaxed font-medium"
+            ></p>
+            <button
+              class="mt-8 text-purple-600 text-[10px] font-black uppercase tracking-[0.2em] hover:text-purple-800 transition-colors"
+              onclick="location.reload()"
+            >
+              New Analysis
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer Decor -->
+      <div
+        class="mt-12 flex justify-between items-center opacity-30 relative z-20"
+      >
+        <span class="text-[9px] font-black tracking-widest text-gray-600"
+          >ENGINE_BUILD: v2.0.ELITE</span
+        >
+        <div class="flex gap-1.5">
+          <div class="w-1 h-1 bg-purple-400 rounded-full"></div>
+          <div class="w-1 h-1 bg-pink-400 rounded-full"></div>
+          <div class="w-1 h-1 bg-gray-400 rounded-full"></div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const dropArea = document.getElementById("drop-area");
+      const fileInput = document.getElementById("file-input");
+      const previewImg = document.getElementById("preview-img");
+      const scanBar = document.getElementById("scan-bar");
+      const dropContent = document.getElementById("drop-content");
+      const loadingState = document.getElementById("loading-state");
+      const idleState = document.getElementById("idle-state");
+      const resultPanel = document.getElementById("result-panel");
+      const resTitle = document.getElementById("result-title");
+      const resText = document.getElementById("result-text");
+      const confBar = document.getElementById("conf-bar");
+      const confText = document.getElementById("conf-text");
+      const statusDot = document.getElementById("status-dot");
+
+      dropArea.onclick = () => fileInput.click();
+      fileInput.onchange = (e) => handleFile(e.target.files[0]);
+
+      function handleFile(file) {
+        if (!file) return;
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => {
+          dropContent.classList.add("opacity-0");
+          setTimeout(() => {
+            dropContent.classList.add("hidden");
+            previewImg.src = reader.result;
+            previewImg.classList.remove("hidden");
+            previewImg.classList.add("animate-fadeIn");
+          }, 300);
+
+          scanBar.style.display = "block";
+          idleState.classList.add("hidden");
+          loadingState.classList.remove("hidden");
+          resultPanel.style.display = "none";
+
+          // Call prediction
+          analyze(file);
+        };
+      }
+
+      async function analyze(file) {
+        const formData = new FormData();
+        formData.append("file", file);
+
+        try {
+          // Connecting to http://localhost:5000 as per your terminal log
+          const response = await fetch("http://localhost:5000/predict", {
+            method: "POST",
+            body: formData,
+          });
+          const data = await response.json();
+
+          // Artificial delay for scanning feel
+          setTimeout(() => showResult(data), 2500);
+        } catch (err) {
+          console.error(err);
+          alert(
+            "Deep Learning Server not reachable. Ensure server.py is running on port 5000.",
+          );
+          location.reload();
+        }
+      }
+
+      function showResult(data) {
+        scanBar.style.display = "none";
+        loadingState.classList.add("hidden");
+        resultPanel.style.display = "block";
+
+        if (data.label === "AUTHENTIC") {
+          resTitle.innerText = "Natural Portrait";
+          statusDot.className =
+            "w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.4)]";
+          resText.innerText = `Forensic validation confirms biological origins. Analysis indicates ${data.confidence}% confidence in natural cellular textures.`;
+          confText.innerText = `${data.confidence}% Confidence`;
+          confBar.style.width = data.confidence + "%";
+          confBar.className = "h-full bg-emerald-400";
+          confetti({
+            particleCount: 100,
+            spread: 70,
+            origin: { y: 0.8 },
+            colors: ["#9d50bb", "#ec4899", "#ffffff"],
+          });
+        } else {
+          resTitle.innerText = "Synthetic Trace";
+          statusDot.className =
+            "w-2.5 h-2.5 rounded-full bg-pink-500 shadow-[0_0_10px_rgba(236,72,153,0.4)]";
+          resText.innerText = `Generative patterns detected. Algorithmic analysis suggests a ${data.confidence}% probability of AI synthesis.`;
+          confText.innerText = `${data.confidence}% AI Trace`;
+          confBar.style.width = data.confidence + "%";
+          confBar.className = "h-full bg-pink-500";
+        }
+      }
+
+      // Initialize Premium Tilt
+      VanillaTilt.init(document.querySelectorAll(".app-container"), {
+        max: 2,
+        speed: 1000,
+        glare: true,
+        "max-glare": 0.08,
+        scale: 1.01,
+      });
+    </script>
+  </body>
+</html>
