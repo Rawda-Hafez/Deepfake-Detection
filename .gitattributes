@@ -1,0 +1,2 @@
+# Tell GitHub Linguist to ignore Jupyter notebooks from language stats so Python becomes the primary language
+*.ipynb linguist-detectable=false
